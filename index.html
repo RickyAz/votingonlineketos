@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E-Voting OSIS Akun Sistem</title>
+    <title>E-Voting Akun Sistem Baru</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>body { font-family: 'Plus Jakarta Sans', sans-serif; }</style>
@@ -17,7 +17,7 @@
     </header>
 
     <!-- Konten Utama -->
-    <main class="container mx-auto p-4 max-w-4xl flex-grow flex items-center justify-center py-10">
+    <main class="container mx-auto p-4 max-w-6xl flex-grow flex items-center justify-center py-10">
         
         <!-- JENDELA 1: FORM LOGIN AKUN SISWA -->
         <div id="box-login" class="w-full max-w-md bg-white p-8 rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 transition-all">
@@ -47,7 +47,8 @@
                 <p id="display-username" class="text-sm text-slate-400 mt-1">Akun: --</p>
             </div>
             
-            <div id="container-kandidat" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- PERBAIKAN LAYOUT: Diubah dari grid-cols-2 menjadi md:grid-cols-3 agar berjejer 3 kolom -->
+            <div id="container-kandidat" class="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
                 <!-- Data Paslon Di-inject Otomatis Di Sini -->
             </div>
         </div>
@@ -60,9 +61,9 @@
     </footer>
 
     <script>
-        // ======= MASUKKAN URL GOOGLE APPS SCRIPT BARU ANDA DI SINI =======
-        const GAS_VOTING_URL = "https://script.google.com/macros/s/AKfycbzHIlB5eK4Kky6_4AiDyh9WV9oWjTXSWNVCsmghyWI2b4RpbZlo9aBTLxZfkyx8X0B8/exec"; 
-        // ================================================================
+        // ======= TEMPELKAN kembali URL GOOGLE APPS SCRIPT ANDA DI SINI =======
+        const GAS_VOTING_URL = "https://script.google.com/macros/s/AKfycbzHIlB5eK4Kky6_4AiDyh9WV9oWjTXSWNVCsmghyWI2b4RpbZlo9aBTLxZfkyx8X0B8/exec "; 
+        // ====================================================================
 
         let sessionUsername = "";
         let sessionPassword = "";
@@ -71,7 +72,7 @@
             const uInput = document.getElementById('username').value.trim();
             const pInput = document.getElementById('password').value.trim();
             
-            if(!uInput || !pInput) return alert('Username and Password wajib diisi!');
+            if(!uInput || !pInput) return alert('Username dan Password wajib diisi!');
             
             const btn = document.getElementById('btn-login');
             btn.innerText = "Memverifikasi Akun...";
@@ -80,7 +81,6 @@
             sessionUsername = uInput;
             sessionPassword = pInput;
 
-            // Hit ke API Apps Script untuk mencocokkan kredensial
             fetch(GAS_VOTING_URL, {
                 method: "POST",
                 mode: "cors",
@@ -98,7 +98,6 @@
                         alert(`🚫 Akses Ditolak:\n${res.error}`);
                         window.location.reload();
                     } else {
-                        // Jika lolos login & belum vote, muat data kandidat (GET)
                         muatDaftarKandidat();
                     }
                 } else {
@@ -123,18 +122,30 @@
                     
                     res.data.forEach(paslon => {
                         htmlCard += `
-                            <div class="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all text-center flex flex-col justify-between">
+                            <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all text-center flex flex-col justify-between h-full">
                                 <div>
-                                    <div class="w-16 h-16 bg-blue-50 border border-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-2xl font-black mx-auto mb-4">
+                                    <!-- Nomor Paslon -->
+                                    <div class="w-12 h-12 bg-blue-50 border border-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-xl font-black mx-auto mb-3">
                                         0${paslon.id}
                                     </div>
-                                    <h3 class="text-lg font-bold text-slate-800">${paslon.nama}</h3>
-                                    <div class="text-left bg-slate-50 border border-slate-100 p-4 rounded-xl my-4 min-h-[120px]">
+                                    
+                                    <!-- Foto Kandidat -->
+                                    <div class="w-full h-56 bg-slate-100 rounded-xl overflow-hidden mb-4 border border-slate-100">
+                                        <img src="${paslon.foto}" alt="Foto ${paslon.nama}" class="w-full h-full object-cover object-center">
+                                    </div>
+
+                                    <!-- Nama Kandidat -->
+                                    <h3 class="text-base font-extrabold text-slate-800 tracking-tight px-1 mb-3">${paslon.nama}</h3>
+                                    
+                                    <!-- Visi & Misi -->
+                                    <div class="text-left bg-slate-50 border border-slate-100 p-4 rounded-xl mb-5 min-h-[120px]">
                                         <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Visi & Misi</span>
                                         <p class="text-slate-600 text-xs leading-relaxed whitespace-pre-line">${paslon.visi_misi}</p>
                                     </div>
                                 </div>
-                                <button onclick="eksekusiVoting(${paslon.id})" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl shadow-md shadow-emerald-100 transition-all">
+                                
+                                <!-- Tombol Coblos -->
+                                <button onclick="eksekusiVoting(${paslon.id})" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow-md shadow-emerald-100 transition-all transform active:scale-[0.98]">
                                     Coblos Paslon 0${paslon.id}
                                 </button>
                             </div>
